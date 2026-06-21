@@ -21,20 +21,6 @@ LABELS=(
     "selkie"
 )
 
-VERSIONS=(
-    "0.2.2"
-    "0.8.0-alpha.1"
-    "0.2.0"
-    "0.3.0"
-)
-
-DESCRIPTIONS=(
-    "Fast native Mermaid renderer, 23 diagram types, SVG output"
-    "Parity-focused headless Mermaid, SVG/PNG/ASCII output"
-    "Pure Rust Mermaid, parse+layout+render to SVG/PNG/GPU"
-    "Full Rust Mermaid parser & renderer, SVG/ASCII/text"
-)
-
 echo "============================================"
 echo "  Mermaid Rust SVG Libraries Benchmark"
 echo "============================================"
@@ -44,23 +30,17 @@ echo "Rust: $(rustc --version)"
 echo "OS:   $(uname -srm)"
 echo ""
 
-> "$RESULTS_DIR/all_results.jsonl"
-
 for i in "${!CRATES[@]}"; do
     crate="${CRATES[$i]}"
     label="${LABELS[$i]}"
-    version="${VERSIONS[$i]}"
-    desc="${DESCRIPTIONS[$i]}"
 
     echo "--------------------------------------------"
-    echo "  Benchmarking: $label v$version"
-    echo "  $desc"
+    echo "  Benchmarking: $label"
     echo "--------------------------------------------"
 
     if cargo bench -p "$crate" --bench bench -- --noplot 2>&1 | tee "$RESULTS_DIR/${label}.log"; then
-        echo "{\"status\":\"ok\",\"crate\":\"$label\",\"version\":\"$version\",\"description\":\"$desc\"}" >> "$RESULTS_DIR/all_results.jsonl"
+        echo "  [OK] $label completed"
     else
-        echo "{\"status\":\"error\",\"crate\":\"$label\",\"version\":\"$version\",\"description\":\"$desc\"}" >> "$RESULTS_DIR/all_results.jsonl"
         echo "  [WARN] $label benchmarks had errors (partial results may exist)"
     fi
     echo ""

@@ -3,39 +3,17 @@
 
 import argparse
 import json
-import os
 import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 
-CRATE_META = {
-    "mermaid-rs-renderer": {
-        "version": "0.2.2",
-        "description": "Fast native Mermaid renderer, 23 diagram types, SVG output",
-        "url": "https://crates.io/crates/mermaid-rs-renderer",
-        "output_type": "SVG",
-    },
-    "merman": {
-        "version": "0.8.0-alpha.1",
-        "description": "Parity-focused headless Mermaid, SVG/PNG/ASCII output",
-        "url": "https://crates.io/crates/merman",
-        "output_type": "SVG",
-    },
-    "rusty-mermaid": {
-        "version": "0.2.0",
-        "description": "Pure Rust Mermaid, parse+layout+render to SVG/PNG/GPU",
-        "url": "https://crates.io/crates/rusty-mermaid",
-        "output_type": "SVG",
-    },
-    "selkie": {
-        "version": "0.3.0",
-        "description": "Full Rust Mermaid parser & renderer, SVG output",
-        "url": "https://crates.io/crates/selkie-rs",
-        "output_type": "SVG",
-    },
-}
+SCRIPT_DIR = Path(__file__).resolve().parent
+
+def load_crate_meta() -> dict:
+    with open(SCRIPT_DIR / "crates.json") as f:
+        return json.load(f)
 
 
 def parse_criterion_dir(criterion_dir: str) -> list[dict]:
@@ -118,7 +96,9 @@ def parse_log_files(results_dir: str) -> list[dict]:
 
 def to_ns(value: float, unit: str) -> float:
     multipliers = {"ps": 0.001, "ns": 1.0, "µs": 1_000, "us": 1_000, "ms": 1_000_000, "s": 1_000_000_000}
-    return value * multipliers.get(unit, 1.0)
+    if unit not in multipliers:
+        raise ValueError(f"Unknown time unit: {unit!r}")
+    return value * multipliers[unit]
 
 
 def format_time(ns: float) -> str:
@@ -132,8 +112,13 @@ def format_time(ns: float) -> str:
         return f"{ns / 1_000_000_000:.3f} s"
 
 
+def _chart_id(bench: str, index: int) -> str:
+    return f"chart_{index}"
+
+
 def generate_html(results: list[dict], output_path: str):
     """Generate a modern HTML report from benchmark results."""
+    crate_meta = load_crate_meta()
     bench_names = sorted(set(r["bench"] for r in results))
     groups = sorted(set(r["group"] for r in results))
 
@@ -166,7 +151,7 @@ def generate_html(results: list[dict], output_path: str):
 
     table_rows = ""
     for group in groups:
-        meta = CRATE_META.get(group, {})
+        meta = crate_meta.get(group, {})
         version = meta.get("version", "?")
         desc = meta.get("description", "")
         url = meta.get("url", "#")
@@ -200,7 +185,9 @@ def generate_html(results: list[dict], output_path: str):
         if not ds["values"]:
             continue
         color = colors[i % len(colors)]
-        chart_id = f"chart_{bench.replace(' ', '_').replace('-', '_')}"
+        chart_id = _chart_id(bench, i)
+        bench_js = json.dumps(bench)
+        bench_label_js = json.dumps(f"{bench} (µs)")
         chart_js_blocks += f"""
     {{
         const ctx = document.getElementById('{chart_id}').getContext('2d');
@@ -209,7 +196,7 @@ def generate_html(results: list[dict], output_path: str):
             data: {{
                 labels: {json.dumps(ds['labels'])},
                 datasets: [{{
-                    label: '{bench} (µs)',
+                    label: {bench_label_js},
                     data: {json.dumps(ds['values'])},
                     backgroundColor: '{color}44',
                     borderColor: '{color}',
@@ -225,7 +212,7 @@ def generate_html(results: list[dict], output_path: str):
                     legend: {{ display: false }},
                     title: {{
                         display: true,
-                        text: '{bench}',
+                        text: {bench_js},
                         font: {{ size: 16, weight: '600' }},
                         color: '#1e293b',
                         padding: {{ bottom: 16 }}
@@ -255,11 +242,11 @@ def generate_html(results: list[dict], output_path: str):
 """
 
     canvas_blocks = ""
-    for bench in bench_names:
+    for i, bench in enumerate(bench_names):
         ds = chart_datasets[bench]
         if not ds["values"]:
             continue
-        chart_id = f"chart_{bench.replace(' ', '_').replace('-', '_')}"
+        chart_id = _chart_id(bench, i)
         canvas_blocks += f"""
         <div class="chart-card">
             <canvas id="{chart_id}"></canvas>

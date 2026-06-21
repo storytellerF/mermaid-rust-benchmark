@@ -5,24 +5,19 @@ const COMPLEX: &str = include_str!("../../test-data/complex_flowchart.mmd");
 const SEQUENCE: &str = include_str!("../../test-data/sequence_diagram.mmd");
 
 fn bench_render_svg(c: &mut Criterion) {
+    let simple = selkie::parse(SIMPLE).unwrap();
+    let complex = selkie::parse(COMPLEX).unwrap();
+    let sequence = selkie::parse(SEQUENCE).unwrap();
+
     let mut g = c.benchmark_group("selkie");
     g.bench_function("simple_flowchart", |b| {
-        b.iter(|| {
-            let diagram = selkie::parse(SIMPLE).unwrap();
-            selkie::render::render(&diagram).unwrap()
-        });
+        b.iter(|| selkie::render::render(&simple).unwrap());
     });
     g.bench_function("complex_flowchart", |b| {
-        b.iter(|| {
-            let diagram = selkie::parse(COMPLEX).unwrap();
-            selkie::render::render(&diagram).unwrap()
-        });
+        b.iter(|| selkie::render::render(&complex).unwrap());
     });
     g.bench_function("sequence_diagram", |b| {
-        b.iter(|| {
-            let diagram = selkie::parse(SEQUENCE).unwrap();
-            selkie::render::render(&diagram).unwrap()
-        });
+        b.iter(|| selkie::render::render(&sequence).unwrap());
     });
     g.finish();
 }

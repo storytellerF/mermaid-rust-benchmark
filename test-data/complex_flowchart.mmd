@@ -1,0 +1,29 @@
+flowchart TD
+    A[Christmas] -->|Get money| B(Go shopping)
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[Car]
+    D --> G[Great choice!]
+    E --> G
+    F --> G
+    G --> H{Satisfied?}
+    H -->|Yes| I[Keep it]
+    H -->|No| J[Return it]
+    J --> B
+    I --> K[End]
+
+    subgraph shopping [Shopping Process]
+        B
+        C
+        D
+        E
+        F
+    end
+
+    subgraph result [Result]
+        G
+        H
+        I
+        J
+    end

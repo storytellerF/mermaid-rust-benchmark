@@ -1,0 +1,26 @@
+{
+  "mermaid-rs-renderer": {
+    "version": "0.2.2",
+    "description": "Fast native Mermaid renderer, 23 diagram types, SVG output",
+    "url": "https://crates.io/crates/mermaid-rs-renderer",
+    "output_type": "SVG"
+  },
+  "merman": {
+    "version": "0.8.0-alpha.1",
+    "description": "Parity-focused headless Mermaid, SVG/PNG/ASCII output",
+    "url": "https://crates.io/crates/merman",
+    "output_type": "SVG"
+  },
+  "rusty-mermaid": {
+    "version": "0.2.0",
+    "description": "Pure Rust Mermaid, parse+layout+render to SVG/PNG/GPU",
+    "url": "https://crates.io/crates/rusty-mermaid",
+    "output_type": "SVG"
+  },
+  "selkie": {
+    "version": "0.3.0",
+    "description": "Full Rust Mermaid parser & renderer, SVG/ASCII/text output",
+    "url": "https://crates.io/crates/selkie-rs",
+    "output_type": "SVG"
+  }
+}
