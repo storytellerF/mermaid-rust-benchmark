@@ -2,7 +2,7 @@
 
 Performance benchmark comparing pure-Rust Mermaid diagram libraries.
 
-**Live report:** https://agentstart1.github.io/mermaid-rust-benchmark/
+**Live report:** https://storytellerf.github.io/mermaid-rust-benchmark/
 
 ## Libraries
 
