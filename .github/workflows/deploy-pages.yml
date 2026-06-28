@@ -3,6 +3,15 @@ name: Benchmark & Deploy Report
 on:
   push:
     branches: [main]
+    paths:
+      - 'bench-**/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'run_benchmarks.sh'
+      - 'generate_report.py'
+      - 'crates.json'
+      - 'test-data/**'
+      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
