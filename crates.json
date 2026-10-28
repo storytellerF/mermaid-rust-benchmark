@@ -1,12 +1,12 @@
 {
   "mermaid-rs-renderer": {
-    "version": "0.2.2",
+    "version": "0.3.1",
     "description": "Fast native Mermaid renderer, 23 diagram types, SVG output",
     "url": "https://crates.io/crates/mermaid-rs-renderer",
     "output_type": "SVG"
   },
   "merman": {
-    "version": "0.8.0-alpha.1",
+    "version": "0.8.0-alpha.3",
     "description": "Parity-focused headless Mermaid, SVG/PNG/ASCII output",
     "url": "https://crates.io/crates/merman",
     "output_type": "SVG"

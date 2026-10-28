@@ -10,6 +10,7 @@ from pathlib import Path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+BENCHMARKS = ("simple_flowchart", "complex_flowchart", "sequence_diagram")
 
 def load_crate_meta() -> dict:
     with open(SCRIPT_DIR / "crates.json") as f:
@@ -430,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function() {{
 </html>
 """
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"HTML report written to: {output_path}")
 
@@ -450,6 +451,14 @@ def main():
 
     if not results:
         print("ERROR: No benchmark results found!", file=sys.stderr)
+        sys.exit(1)
+
+    expected = {(group, bench) for group in load_crate_meta() for bench in BENCHMARKS}
+    measured = {(result["group"], result["bench"]) for result in results}
+    missing = expected - measured
+    if missing:
+        names = ", ".join(f"{group}/{bench}" for group, bench in sorted(missing))
+        print(f"ERROR: Incomplete benchmark results; missing: {names}", file=sys.stderr)
         sys.exit(1)
 
     print(f"Found {len(results)} benchmark measurements")

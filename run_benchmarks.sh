@@ -5,6 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 RESULTS_DIR="$SCRIPT_DIR/results"
+# Keep build artifacts cached, but never reuse measurements from an earlier run.
+rm -rf -- "$RESULTS_DIR" "$SCRIPT_DIR/target/criterion"
+rm -f -- "$SCRIPT_DIR/report.html"
 mkdir -p "$RESULTS_DIR"
 
 CRATES=(
@@ -30,6 +33,7 @@ echo "Rust: $(rustc --version)"
 echo "OS:   $(uname -srm)"
 echo ""
 
+failed=()
 for i in "${!CRATES[@]}"; do
     crate="${CRATES[$i]}"
     label="${LABELS[$i]}"
@@ -38,13 +42,19 @@ for i in "${!CRATES[@]}"; do
     echo "  Benchmarking: $label"
     echo "--------------------------------------------"
 
-    if cargo bench -p "$crate" --bench bench -- --noplot 2>&1 | tee "$RESULTS_DIR/${label}.log"; then
+    if cargo bench --locked --target-dir "$SCRIPT_DIR/target" -p "$crate" --bench bench -- --noplot 2>&1 | tee "$RESULTS_DIR/${label}.log"; then
         echo "  [OK] $label completed"
     else
-        echo "  [WARN] $label benchmarks had errors (partial results may exist)"
+        echo "  [ERROR] $label benchmarks failed" >&2
+        failed+=("$label")
     fi
     echo ""
 done
+
+if ((${#failed[@]})); then
+    echo "[ERROR] Failed benchmarks: ${failed[*]}. Report generation skipped." >&2
+    exit 1
+fi
 
 echo "============================================"
 echo "  Collecting criterion results..."
