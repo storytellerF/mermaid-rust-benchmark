@@ -8,8 +8,8 @@ Performance benchmark comparing pure-Rust Mermaid diagram libraries.
 
 | Crate | Version | Output | Description |
 |-------|---------|--------|-------------|
-| [mermaid-rs-renderer](https://crates.io/crates/mermaid-rs-renderer) | 0.2.2 | SVG | Fast native Mermaid renderer, 23 diagram types |
-| [merman](https://crates.io/crates/merman) | 0.8.0-alpha.1 | SVG | Parity-focused headless Mermaid |
+| [mermaid-rs-renderer](https://crates.io/crates/mermaid-rs-renderer) | 0.3.1 | SVG | Fast native Mermaid renderer, 23 diagram types |
+| [merman](https://crates.io/crates/merman) | 0.8.0-alpha.3 | SVG | Parity-focused headless Mermaid |
 | [rusty-mermaid](https://crates.io/crates/rusty-mermaid) | 0.2.0 | SVG | Pure Rust Mermaid, parse + layout + render |
 | [selkie](https://crates.io/crates/selkie-rs) | 0.3.0 | SVG | Full Rust Mermaid parser & renderer |
 
@@ -28,15 +28,17 @@ Benchmarks measure end-to-end SVG rendering time using [Criterion.rs](https://gi
 ```bash
 # Prerequisites: Rust stable, Python 3
 bash run_benchmarks.sh
-# Opens report.html in the project root
+# Writes report.html in the project root
 ```
 
 Or run a single crate:
 
 ```bash
-cargo bench -p bench-merman
+cargo bench --locked -p bench-merman
 ```
 
-## CI
+Each full run replaces previous logs, Criterion measurements, and `report.html`.
+A report is generated only when every library succeeds and all 12 measurements
+are present. Failed runs return a nonzero status and leave logs in `results/`.
 
-On every push to `main`, GitHub Actions runs all benchmarks and deploys the HTML report to GitHub Pages automatically.
+See [DEVELOPMENT.md](DEVELOPMENT.md) for validation and CI details.

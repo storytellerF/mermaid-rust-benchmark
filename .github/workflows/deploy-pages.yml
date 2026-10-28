@@ -11,6 +11,7 @@ on:
       - 'generate_report.py'
       - 'crates.json'
       - 'test-data/**'
+      - 'tests/**'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -43,6 +44,9 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.x"
+
+      - name: Verify benchmark failure handling
+        run: python3 -m unittest discover -s tests -v
 
       - name: Run benchmarks
         run: bash run_benchmarks.sh
