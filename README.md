@@ -4,8 +4,6 @@
 
 **在线报告：** https://storytellerf.github.io/mermaid-rust-benchmark/
 
-<a id="libraries"></a>
-
 ## 参与比较的库
 
 | Crate | 版本 | 输出 | 说明 |
@@ -14,8 +12,6 @@
 | [merman](https://crates.io/crates/merman) | 0.8.0-alpha.3 | SVG | 注重与 Mermaid 行为一致的无界面实现 |
 | [rusty-mermaid](https://crates.io/crates/rusty-mermaid) | 0.2.0 | SVG | 纯 Rust Mermaid 实现，包含解析、布局和渲染 |
 | [selkie](https://crates.io/crates/selkie-rs) | 0.3.0 | SVG | 完整的 Rust Mermaid 解析器与渲染器 |
-
-<a id="test-cases"></a>
 
 ## 测试用例
 
@@ -26,8 +22,6 @@
 - **sequence_diagram**：3 个参与者、8 条消息的时序图。
 
 使用 [Criterion.rs](https://github.com/bheisler/criterion.rs) 测量端到端 SVG 渲染耗时。
-
-<a id="run-locally"></a>
 
 ## 本地运行
 
