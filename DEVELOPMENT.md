@@ -23,3 +23,17 @@ cargo bench --workspace --locked --no-run
 ## CI 与部署
 
 涉及匹配路径的 `main` push 或手动触发，会先运行受控测试，再执行完整基准测试。只有这些步骤成功，才准备并上传 Pages 产物。部署作业要求基准测试作业成功；执行器返回非零状态时，不完整报告不能发布。不要为这些步骤添加 `continue-on-error`，也不要给部署作业添加 `always()`。
+
+## 报告主题检查
+
+独立 HTML 报告自动跟随 `prefers-color-scheme`，支持运行中切换及页面返回。图表系列保留语义颜色。
+
+可选的浏览器测试需要 Python Playwright 和已安装的 Google Chrome：
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install playwright
+.venv/bin/python tests/test_report_theme.py -v
+```
+
+Windows 上改用 `.venv/Scripts/python` 和 `.venv/Scripts/pip`。测试从报告所用的 CDN 加载 Chart.js，因此需要网络访问。覆盖首次加载浅色/深色偏好、刷新、运行中切换、实际文字对比度、链接交互状态，以及 Chart.js 加载失败时的可读提示。未安装 Playwright 时，标准 unittest 测试会跳过这些可选检查。报告测试数据为合成测量值，不代表实际基准性能。

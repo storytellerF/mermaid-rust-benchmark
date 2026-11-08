@@ -192,7 +192,7 @@ def generate_html(results: list[dict], output_path: str):
         chart_js_blocks += f"""
     {{
         const ctx = document.getElementById('{chart_id}').getContext('2d');
-        new Chart(ctx, {{
+        charts.push(new Chart(ctx, {{
             type: 'bar',
             data: {{
                 labels: {json.dumps(ds['labels'])},
@@ -238,7 +238,7 @@ def generate_html(results: list[dict], output_path: str):
                     }}
                 }}
             }}
-        }});
+        }}));
     }}
 """
 
@@ -257,25 +257,47 @@ def generate_html(results: list[dict], output_path: str):
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="color-scheme" content="light dark">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mermaid Rust Libraries Benchmark Report</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
+:root {{
+    color-scheme: light dark;
+    --page: #f1f5f9; --surface: #ffffff; --subtle: #e2e8f0;
+    --text: #1e293b; --muted: #475569; --border: #cbd5e1;
+    --link: #4338ca; --link-hover: #6d28d9;
+    --success: #065f46; --success-bg: #ecfdf5;
+    --tooltip-bg: #1e293b; --tooltip-text: #ffffff;
+}}
+@media (prefers-color-scheme: dark) {{
+    :root {{
+        --page: #0f172a; --surface: #1e293b; --subtle: #334155;
+        --text: #f1f5f9; --muted: #cbd5e1; --border: #64748b;
+        --link: #c4b5fd; --link-hover: #ddd6fe;
+        --success: #a7f3d0; --success-bg: #064e3b;
+        --tooltip-bg: #f1f5f9; --tooltip-text: #0f172a;
+    }}
+}}
+a:hover {{ text-decoration: underline; }}
+a:focus-visible {{ outline: 2px solid var(--link); outline-offset: 3px; }}
+code, pre {{ background: var(--subtle); color: var(--text); }}
+.chart-error {{ color: var(--muted); }}
 *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 body {{
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea11 0%, #764ba211 100%);
-    min-height: 100vh; color: #1e293b; line-height: 1.6;
+    background: var(--page);
+    min-height: 100vh; color: var(--text); line-height: 1.6;
 }}
 .container {{ max-width: 1400px; margin: 0 auto; padding: 2rem; }}
 header {{
     text-align: center; margin-bottom: 3rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3949ab 0%, #65378b 100%);
     padding: 3rem 2rem; border-radius: 20px; color: white;
     box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
 }}
 header h1 {{ font-size: 2.5rem; font-weight: 800; letter-spacing: -0.02em; }}
-header p {{ font-size: 1.1rem; opacity: 0.9; margin-top: 0.5rem; }}
+header p {{ font-size: 1.1rem; margin-top: 0.5rem; }}
 .meta {{ display: flex; gap: 2rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }}
 .meta-item {{
     background: rgba(255,255,255,0.15); padding: 0.5rem 1.2rem;
@@ -284,7 +306,7 @@ header p {{ font-size: 1.1rem; opacity: 0.9; margin-top: 0.5rem; }}
 .section {{ margin-bottom: 3rem; }}
 .section h2 {{
     font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem;
-    color: #334155; display: flex; align-items: center; gap: 0.5rem;
+    color: var(--text); display: flex; align-items: center; gap: 0.5rem;
 }}
 .section h2::before {{
     content: ''; display: inline-block; width: 4px; height: 28px;
@@ -293,43 +315,42 @@ header p {{ font-size: 1.1rem; opacity: 0.9; margin-top: 0.5rem; }}
 .table-wrap {{
     overflow-x: auto; border-radius: 16px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    background: white;
+    background: var(--surface);
 }}
 table {{ width: 100%; border-collapse: collapse; font-size: 0.92rem; }}
 thead th {{
-    background: #f8fafc; padding: 1rem; text-align: left; font-weight: 600;
-    color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap;
+    background: var(--subtle); padding: 1rem; text-align: left; font-weight: 600;
+    color: var(--muted); border-bottom: 2px solid var(--border); white-space: nowrap;
     position: sticky; top: 0; z-index: 1;
 }}
-tbody td {{ padding: 0.85rem 1rem; border-bottom: 1px solid #f1f5f9; }}
-tbody tr:hover {{ background: #f8fafc; }}
+tbody td {{ padding: 0.85rem 1rem; border-bottom: 1px solid var(--subtle); }}
+tbody tr:hover {{ background: var(--subtle); }}
 tbody tr:last-child td {{ border-bottom: none; }}
 .lib-name {{
     font-weight: 600; white-space: nowrap;
 }}
 .lib-name a {{
-    color: #4f46e5; text-decoration: none;
-    transition: color 0.2s;
+    color: var(--link); text-decoration: none;
 }}
-.lib-name a:hover {{ color: #7c3aed; text-decoration: underline; }}
+.lib-name a:hover {{ color: var(--link-hover); text-decoration: underline; }}
 .version {{
     display: inline-block; font-size: 0.75rem; font-weight: 500;
-    color: #64748b; background: #f1f5f9; padding: 0.1rem 0.5rem;
+    color: var(--muted); background: var(--subtle); padding: 0.1rem 0.5rem;
     border-radius: 10px; margin-left: 0.5rem;
 }}
 .lib-type {{
     font-size: 0.8rem; font-weight: 500; text-align: center;
 }}
-.lib-desc {{ color: #64748b; font-size: 0.85rem; max-width: 320px; }}
+.lib-desc {{ color: var(--muted); font-size: 0.85rem; max-width: 320px; }}
 .bench-cell {{
     font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500;
 }}
 .bench-cell .ci {{
-    display: block; font-size: 0.72rem; color: #94a3b8; font-weight: 400;
+    display: block; font-size: 0.72rem; color: var(--muted); font-weight: 400;
 }}
-.bench-cell.na {{ color: #cbd5e1; font-style: italic; font-weight: 400; }}
+.bench-cell.na {{ color: var(--muted); font-style: italic; font-weight: 400; }}
 .bench-cell.fastest {{
-    color: #059669; background: #ecfdf5;
+    color: var(--success); background: var(--success-bg);
 }}
 .bench-header {{ text-align: center; }}
 .charts-grid {{
@@ -337,14 +358,14 @@ tbody tr:last-child td {{ border-bottom: none; }}
     gap: 1.5rem;
 }}
 .chart-card {{
-    background: white; border-radius: 16px; padding: 1.5rem;
+    background: var(--surface); border-radius: 16px; padding: 1.5rem;
     box-shadow: 0 4px 24px rgba(0,0,0,0.06);
     height: 340px;
 }}
 footer {{
-    text-align: center; padding: 2rem; color: #94a3b8; font-size: 0.85rem;
+    text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem;
 }}
-footer a {{ color: #6366f1; text-decoration: none; }}
+footer a {{ color: var(--link); text-decoration: none; }}
 @media (max-width: 768px) {{
     .container {{ padding: 1rem; }}
     header {{ padding: 2rem 1rem; }}
@@ -423,8 +444,44 @@ document.addEventListener('DOMContentLoaded', function() {{
         if (minCell) minCell.classList.add('fastest');
     }}
 
-    // Charts
+    // The table remains usable when the optional CDN cannot be reached.
+    if (typeof Chart === 'undefined') {{
+        document.querySelectorAll('.chart-card').forEach(card => {{
+            const message = document.createElement('p');
+            message.className = 'chart-error';
+            message.setAttribute('role', 'status');
+            message.textContent = 'Charts unavailable. See the results table above.';
+            card.replaceChildren(message);
+        }});
+        return;
+    }}
+    const charts = [];
     {chart_js_blocks}
+    function updateChartTheme() {{
+        const style = getComputedStyle(document.documentElement);
+        const color = name => style.getPropertyValue(name).trim();
+        charts.forEach(chart => {{
+            chart.options.color = color('--muted');
+            chart.options.plugins.title.color = color('--text');
+            Object.assign(chart.options.plugins.tooltip, {{
+                backgroundColor: color('--tooltip-bg'),
+                titleColor: color('--tooltip-text'),
+                bodyColor: color('--tooltip-text'),
+                borderColor: color('--border'),
+                borderWidth: 1,
+            }});
+            Object.values(chart.options.scales).forEach(axis => {{
+                axis.ticks.color = color('--muted');
+                axis.title.color = color('--muted');
+                axis.grid.color = color('--border');
+                axis.border.color = color('--border');
+            }});
+            chart.update('none');
+        }});
+    }}
+    updateChartTheme();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateChartTheme);
+    window.addEventListener('pageshow', updateChartTheme);
 }});
 </script>
 </body>
