@@ -1,29 +1,35 @@
 # mermaid-rust-benchmark
 
-Performance benchmark comparing pure-Rust Mermaid diagram libraries.
+用于比较纯 Rust Mermaid 图表库性能的基准测试。
 
-**Live report:** https://storytellerf.github.io/mermaid-rust-benchmark/
+**在线报告：** https://storytellerf.github.io/mermaid-rust-benchmark/
 
-## Libraries
+<a id="libraries"></a>
 
-| Crate | Version | Output | Description |
+## 参与比较的库
+
+| Crate | 版本 | 输出 | 说明 |
 |-------|---------|--------|-------------|
-| [mermaid-rs-renderer](https://crates.io/crates/mermaid-rs-renderer) | 0.3.1 | SVG | Fast native Mermaid renderer, 23 diagram types |
-| [merman](https://crates.io/crates/merman) | 0.8.0-alpha.3 | SVG | Parity-focused headless Mermaid |
-| [rusty-mermaid](https://crates.io/crates/rusty-mermaid) | 0.2.0 | SVG | Pure Rust Mermaid, parse + layout + render |
-| [selkie](https://crates.io/crates/selkie-rs) | 0.3.0 | SVG | Full Rust Mermaid parser & renderer |
+| [mermaid-rs-renderer](https://crates.io/crates/mermaid-rs-renderer) | 0.3.1 | SVG | 高速原生 Mermaid 渲染器，支持 23 种图表 |
+| [merman](https://crates.io/crates/merman) | 0.8.0-alpha.3 | SVG | 注重与 Mermaid 行为一致的无界面实现 |
+| [rusty-mermaid](https://crates.io/crates/rusty-mermaid) | 0.2.0 | SVG | 纯 Rust Mermaid 实现，包含解析、布局和渲染 |
+| [selkie](https://crates.io/crates/selkie-rs) | 0.3.0 | SVG | 完整的 Rust Mermaid 解析器与渲染器 |
 
-## Test Cases
+<a id="test-cases"></a>
 
-Each library is benchmarked against three diagram inputs:
+## 测试用例
 
-- **simple_flowchart** — 4-node LR flowchart
-- **complex_flowchart** — 11-node TD flowchart with subgraphs and a loop
-- **sequence_diagram** — 3-participant, 8-message sequence diagram
+每个库都使用三份图表输入进行测量：
 
-Benchmarks measure end-to-end SVG rendering time using [Criterion.rs](https://github.com/bheisler/criterion.rs).
+- **simple_flowchart**：4 个节点的 LR 流程图。
+- **complex_flowchart**：包含子图和循环的 11 节点 TD 流程图。
+- **sequence_diagram**：3 个参与者、8 条消息的时序图。
 
-## Run Locally
+使用 [Criterion.rs](https://github.com/bheisler/criterion.rs) 测量端到端 SVG 渲染耗时。
+
+<a id="run-locally"></a>
+
+## 本地运行
 
 ```bash
 # Prerequisites: Rust stable, Python 3
@@ -31,14 +37,12 @@ bash run_benchmarks.sh
 # Writes report.html in the project root
 ```
 
-Or run a single crate:
+也可以只运行一个 crate：
 
 ```bash
 cargo bench --locked -p bench-merman
 ```
 
-Each full run replaces previous logs, Criterion measurements, and `report.html`.
-A report is generated only when every library succeeds and all 12 measurements
-are present. Failed runs return a nonzero status and leave logs in `results/`.
+每次完整运行会替换已有日志、Criterion 测量数据和 `report.html`。只有全部库都成功且 12 项测量全部齐备时，才生成报告。运行失败时返回非零状态，日志保留在 `results/` 中。
 
-See [DEVELOPMENT.md](DEVELOPMENT.md) for validation and CI details.
+验证与 CI 细节见 [DEVELOPMENT.md](DEVELOPMENT.md)。

@@ -1,46 +1,31 @@
-# Development
+<a id="development"></a>
 
-Use stable Rust, Bash, and Python 3. Run the controlled runner tests without
-compiling Rust or publishing anything:
+# 开发指南
+
+使用 stable Rust、Bash 和 Python 3。以下命令运行受控的执行器测试，不编译 Rust，也不发布任何内容：
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-On Windows, set `BASH` to the Git Bash executable path if Bash is not on `PATH`.
-The tests use fake cargo results to exercise the actual runner and report
-generator, including failed benchmarks, log writes, missing measurements, report
-generation failures, and stale cached results.
+Windows 上如果 Bash 不在 `PATH` 中，将 `BASH` 设为 Git Bash 可执行文件路径。测试使用模拟 cargo 结果，实际运行执行器和报告生成器，覆盖基准测试失败、日志写入、测量缺失、报告生成失败和过时缓存结果等情况。
 
-Compile every benchmark with the committed dependency graph:
+使用已提交的依赖图编译全部基准测试：
 
 ```bash
 cargo bench --workspace --locked --no-run
 ```
 
-Run `bash run_benchmarks.sh` for the complete benchmark and HTML report. The
-runner fixes the target directory to the repository's `target/` so measurement
-cleanup and report collection use the same location even if `CARGO_TARGET_DIR`
-is set. Compiled artifacts remain cached; Criterion measurements, logs, and the
-previous report are removed before each run. Every library is attempted, but
-any failed benchmark or log write prevents report generation and returns a
-nonzero status. The generator also requires all four groups and three cases.
+运行 `bash run_benchmarks.sh` 执行完整基准测试并生成 HTML 报告。执行器将目标目录固定为仓库的 `target/`，即使设置了 `CARGO_TARGET_DIR`，测量清理和报告收集也使用同一位置。编译产物保留缓存；每次运行前清除 Criterion 测量值、日志和上一份报告。执行器会尝试所有库，但任意基准测试或日志写入失败都会阻止报告生成，并返回非零状态。生成器还要求四组库和三种用例全部齐备。
 
-## Dependency compatibility
+<a id="dependency-compatibility"></a>
 
-`merman-render 0.8.0-alpha.3` requires the matching `dugong`, `dugong-graphlib`,
-and `manatee 0.8.0-alpha.3` APIs. Cargo's prerelease ranges permitted alpha.6,
-which removed APIs used by this renderer. Keep these compatible versions in
-`Cargo.lock` and validate upgrades with the compilation command above and a full
-run. See [issue #7](https://github.com/storytellerF/mermaid-rust-benchmark/issues/7).
-The runner uses `--locked` so normal benchmark runs cannot change this graph.
-Keep displayed library versions in `crates.json` and `README.md` consistent with
-the lockfile when upgrading.
+## 依赖兼容性
 
-## CI and deployment
+`merman-render 0.8.0-alpha.3` 需要匹配的 `dugong`、`dugong-graphlib` 和 `manatee 0.8.0-alpha.3` API。Cargo 的预发布版本范围允许解析到 alpha.6，而该版本移除了渲染器使用的 API。在 `Cargo.lock` 中保持这些版本兼容，升级时使用上面的编译命令并执行一次完整运行。参见 [issue #7](https://github.com/storytellerF/mermaid-rust-benchmark/issues/7)。执行器使用 `--locked`，因此普通基准测试不能修改依赖图。升级时，让 `crates.json` 和 `README.md` 显示的库版本与锁文件保持一致。
 
-On matching pushes to `main` or manual dispatch, the workflow runs the controlled
-tests and then the full benchmark. The Pages artifact is prepared and uploaded
-only after these steps succeed. The deploy job requires the benchmark job to
-succeed; a nonzero runner status blocks publication of an incomplete report.
-Do not add `continue-on-error` to these steps or `always()` to the deploy job.
+<a id="ci-and-deployment"></a>
+
+## CI 与部署
+
+涉及匹配路径的 `main` push 或手动触发，会先运行受控测试，再执行完整基准测试。只有这些步骤成功，才准备并上传 Pages 产物。部署作业要求基准测试作业成功；执行器返回非零状态时，不完整报告不能发布。不要为这些步骤添加 `continue-on-error`，也不要给部署作业添加 `always()`。
